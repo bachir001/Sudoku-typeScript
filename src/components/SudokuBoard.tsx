@@ -29,7 +29,7 @@ const SudokuBoard = ({ board, setBoard ,isNewBoard }: { board: Board; setBoard: 
       solvedBoardRef.current = boardCopy;
       
     }
-  }, [board]);
+  }, [board,isNewBoard]);
 
   const handleSolve = () => {
     if (solvedBoardRef.current) {

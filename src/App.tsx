@@ -88,9 +88,9 @@ const App = () => {
   const newGame = () => {
     setDifficulty(difficulties[Math.floor(Math.random() * difficulties.length)]);
     setDifficultiesDisplay("Medium");
-    if (difficulty==0.5) {
+    if (difficulty === 0.5) {
       setDifficultiesDisplay("Hard");
-    }else if (difficulty==0.2) {
+    }else if (difficulty ===0.2) {
       setDifficultiesDisplay("Easy");
     }    
     const newBoard = generateSudokuBoard(difficulty); // Generate a fresh board
