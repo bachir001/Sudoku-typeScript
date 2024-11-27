@@ -8,7 +8,7 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 import '../App.css';
   
 
-const SudokuBoard = ({ board, setBoard }: { board: Board; setBoard: React.Dispatch<React.SetStateAction<Board>> }) => {
+const SudokuBoard = ({ board, setBoard ,isNewBoard }: { board: Board; setBoard: React.Dispatch<React.SetStateAction<Board>>; isNewBoard:boolean }) => {
 
   const [selectedCell, setSelectedCell] = useState<CellType | null>(null);
   const [highlightedCells, setHighlightedCells] = useState<Set<string>>(new Set());
@@ -22,7 +22,7 @@ const SudokuBoard = ({ board, setBoard }: { board: Board; setBoard: React.Dispat
   const solvedBoardRef = useRef<Board | null>(null);
 
   useEffect(() => {
-    if (!solvedBoardRef.current) {
+    if (!solvedBoardRef.current || isNewBoard) {
       // Solve the board once and store the result in the ref
       const boardCopy = JSON.parse(JSON.stringify(board));
       solveSudoku(boardCopy);

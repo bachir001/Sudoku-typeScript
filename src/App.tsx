@@ -64,6 +64,7 @@ const App = () => {
   const [board, setBoard] = useState<Board>(() => generateSudokuBoard(difficulty));
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false); // Modal visibility state
   const [validationMessage, setValidationMessage] = useState<string | null>(null);
+  const [isNewBoard,setIsNewBoard] = useState<boolean>(false);
   const [difficultiesDisplay,setDifficultiesDisplay] = useState<string| any>(getLevel());
 
   const handleDifficultyChange = (level: string) => {
@@ -80,13 +81,21 @@ const App = () => {
         }
         setDifficulty(newDifficulty);
         setBoard(generateSudokuBoard(newDifficulty)); // Regenerate board with selected difficulty
+        setIsNewBoard(true);
         setIsModalOpen(false); // Close the modal after selecting difficulty
    };
 
   const newGame = () => {
-    setDifficulty(difficulties[Math.floor(Math.random() * difficulties.length)]);    
+    setDifficulty(difficulties[Math.floor(Math.random() * difficulties.length)]);
+    setDifficultiesDisplay("Medium");
+    if (difficulty==0.5) {
+      setDifficultiesDisplay("Hard");
+    }else if (difficulty==0.2) {
+      setDifficultiesDisplay("Easy");
+    }    
     const newBoard = generateSudokuBoard(difficulty); // Generate a fresh board
     setBoard(newBoard); // Update state with the new board
+    setIsNewBoard(true);
   };
 
   const checkSolution = () => {
@@ -118,7 +127,7 @@ const App = () => {
     )}
 
     
-      <SudokuBoard board={board} setBoard={setBoard} />
+      <SudokuBoard board={board} setBoard={setBoard} isNewBoard={isNewBoard}/>
 
 
     {isModalOpen && <Modal onClose={() => setIsModalOpen(false)} onSelectDifficulty={handleDifficultyChange} />}
