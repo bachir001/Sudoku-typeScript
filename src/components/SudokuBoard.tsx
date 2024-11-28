@@ -49,35 +49,33 @@ const SudokuBoard = ({ board, setBoard ,isNewBoard }: { board: Board; setBoard: 
   
     image.onload = async () => {
       try {
+        // Preprocess the image
         const canvas = preprocessImage(image);
-        document.body.appendChild(canvas);
-
+        document.body.appendChild(canvas); // Optional: Add canvas to view the result
+  
+        // Extract text using OCR
         const extractedText = await extractTextFromImage(canvas);
         console.log("Extracted Text:", extractedText);
+  
+        // Parse the extracted text into a 9x9 Sudoku board
         const boardFromImage = parseExtractedTextToBoard(extractedText);
   
-        //|| boardFromImage.flat().some(cell => cell.value === null)
         if (!boardFromImage) {
-          setFeedbackMessage(
-            "Unable to extract a complete Sudoku board from the image. Please try again with a clearer image."
-          );
+          setFeedbackMessage("Failed to extract a valid Sudoku board.");
           setTimeout(() => setFeedbackMessage(null), 3000);
           return;
         }
   
-        setFeedbackMessage(null); // Clear feedback message
         setBoard(boardFromImage);
       } catch (error) {
-        console.error("Error during image upload or processing:", error);
-        setFeedbackMessage(
-          "An error occurred while processing the image. Please try again."
-        );
+        console.error("Error processing the image:", error);
+        setFeedbackMessage("An error occurred during processing.");
         setTimeout(() => setFeedbackMessage(null), 3000);
       }
     };
   
     image.onerror = () => {
-      setFeedbackMessage("Failed to load the image. Please try again.");
+      setFeedbackMessage("Failed to load the image.");
       setTimeout(() => setFeedbackMessage(null), 3000);
     };
   };

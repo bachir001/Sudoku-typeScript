@@ -167,17 +167,25 @@ export const checkSudokuSolution = (board: Board): boolean => {
 
 export const extractTextFromImage = (canvas: HTMLCanvasElement): Promise<string> => {
     return new Promise((resolve, reject) => {
-      Tesseract.recognize(canvas, 'eng') // English language for OCR
-        .then(({ data: { text } }) => {
-            console.log(data,"data");
-            
-          console.log("OCR Text:", text);
-          resolve(text);
-        })
-        .catch(error => {
-          console.error("OCR Error:", error);
-          reject("Failed to extract text from the image.");
-        });
+      Tesseract.recognize(
+        canvas, 
+        'eng', 
+        {
+          // OCR configuration options
+          // @ts-ignore
+          tessedit_char_whitelist: '0123456789', // Only allow numbers
+          psm: Tesseract.PSM.SINGLE_BLOCK, // Adjust for single block of text
+        }
+      )
+      .then(({ data: { text } }) => {
+        console.log(data,"data");
+        console.log("OCR Text:", text);
+        resolve(text);
+      })
+      .catch(error => {
+        console.error("OCR Error:", error);
+        reject("Failed to extract text from the image.");
+      });
     });
   };
   
