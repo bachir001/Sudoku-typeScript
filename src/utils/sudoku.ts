@@ -3,7 +3,7 @@ import { Board,createBoard } from "../types";
 
 import Tesseract from 'tesseract.js';
 
-export const generateSudokuBoard = (difficulty: number, setBoardSolved?: any): Board => {
+export const generateSudokuBoard = (difficulty: number): Board => {
     const board = createBoard(); // Create an empty board
     solveSudoku(board); // Solve it to create a fully solved board
 
@@ -18,39 +18,68 @@ export const generateSudokuBoard = (difficulty: number, setBoardSolved?: any): B
         const col = Math.floor(Math.random() * 9);
 
         const cellKey = `${row}-${col}`;
-        if (!removedCells.has(cellKey) && board[row]?.[col]?.value !== null) {
-            board[row][col].value = null; // Remove the cell's value
-            board[row][col].editable = true; // Mark the cell as editable
-            removedCells.add(cellKey); // Track this cell as removed
-        }
-    }
+        if (!removedCells.has(cellKey) && board[row][col]?.value !== null) {
+            const backup = board[row][col].value; // Backup the cell value
+            board[row][col].value = null; // Remove the cell
+            board[row][col].editable = true; // Mark it as editable
 
-    // Check if the puzzle has a unique solution
-    if (!hasUniqueSolution(board)) {
-        console.log("Puzzle doesn't have a unique solution. Regenerating...");
-        return generateSudokuBoard(difficulty); // Retry if the puzzle doesn't have a unique solution
+            if (hasUniqueSolution(board)) {
+                removedCells.add(cellKey); // Keep the removal if unique
+            } else {
+                // Restore the cell if uniqueness fails
+                board[row][col].value = backup;
+                board[row][col].editable = false;
+            }
+        }
     }
 
     return board;
 };
 
-
-
 // Check if the puzzle has a unique solution
 function hasUniqueSolution(board: Board): boolean {
-    const boardCopy1 = deepCloneBoard(board);
-    const boardCopy2 = deepCloneBoard(board);
-
-    // Solve the puzzle twice and compare solutions
-    const solved1 = solveSudoku(boardCopy1);
-    const solved2 = solveSudoku(boardCopy2);
-
-    // If both attempts solve the board and the solutions are identical, it's a unique solution
-    return solved1 && solved2 && JSON.stringify(boardCopy1) === JSON.stringify(boardCopy2);
+    return countSolutions(deepCloneBoard(board)) === 1;
 }
 
+// Count the number of solutions to the puzzle
+function countSolutions(board: Board): number {
+    let solutionCount = 0;
+
+    function helper(board: Board, row = 0, col = 0): boolean {
+        if (row === 9) {
+            solutionCount++;
+            return solutionCount > 1; // Stop early if more than one solution is found
+        }
+
+        if (col === 9) {
+            return helper(board, row + 1, 0);
+        }
+
+        if (board[row][col]?.value !== null) {
+            return helper(board, row, col + 1);
+        }
+
+        for (let num = 1; num <= 9; num++) {
+            if (isValid(board, row, col, num)) {
+                board[row][col].value = num;
+                if (helper(board, row, col + 1)) {
+                    board[row][col].value = null;
+                    return true;
+                }
+                board[row][col].value = null;
+            }
+        }
+
+        return false;
+    }
+
+    helper(board);
+    return solutionCount;
+}
+
+// Deep clone the board to avoid mutations
 function deepCloneBoard(board: Board): Board {
-    return board.map(row => 
+    return board.map(row =>
         row.map(cell => ({
             value: cell.value,  // Ensures that the value is properly copied
             editable: cell.editable ?? false, // Ensures editable flag is set correctly
@@ -68,7 +97,7 @@ export function solveSudoku(board: Board, row = 0, col = 0): boolean {
         return solveSudoku(board, row + 1, 0);
     }
 
-    if (board[row]?.[col]?.value !== null) {
+    if (board[row][col]?.value !== null) {
         return solveSudoku(board, row, col + 1);
     }
 
@@ -97,6 +126,7 @@ const shuffle = (array: number[]) => {
     return array;
 }
 
+// Check if a number placement is valid
 export function isValid(board: Board, row: number, col: number, num: number): boolean {
     // check if the number is already in the row
     for (let i = 0; i < 9; i++) {
@@ -126,6 +156,7 @@ export function isValid(board: Board, row: number, col: number, num: number): bo
     return true;
 }
 
+// Check if the board is a valid Sudoku solution
 export const checkSudokuSolution = (board: Board): boolean => {
         
     // Check if all cells are filled first
