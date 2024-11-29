@@ -1,5 +1,4 @@
 
-import { data } from "@tensorflow/tfjs";
 import { Board,createBoard } from "../types";
 
 import Tesseract from 'tesseract.js';
@@ -177,9 +176,8 @@ export const extractTextFromImage = (canvas: HTMLCanvasElement): Promise<string>
           psm: Tesseract.PSM.SINGLE_BLOCK, // Adjust for single block of text
         }
       )
-      .then(({ data: { text } }) => {
-        console.log(data,"data");
-        console.log("OCR Text:", text);
+      .then((result) => {
+        const text = result.data.text; // Access 'text' correctly
         resolve(text);
       })
       .catch(error => {

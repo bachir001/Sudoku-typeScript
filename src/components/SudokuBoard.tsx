@@ -55,7 +55,6 @@ const SudokuBoard = ({ board, setBoard ,isNewBoard }: { board: Board; setBoard: 
   
         // Extract text using OCR
         const extractedText = await extractTextFromImage(canvas);
-        console.log("Extracted Text:", extractedText);
   
         // Parse the extracted text into a 9x9 Sudoku board
         const boardFromImage = parseExtractedTextToBoard(extractedText);
@@ -79,27 +78,7 @@ const SudokuBoard = ({ board, setBoard ,isNewBoard }: { board: Board; setBoard: 
       setTimeout(() => setFeedbackMessage(null), 3000);
     };
   };
-  
-  // const parseExtractedTextToBoard = (text: string): Board => {
-  //   const lines = text.split('\n').filter(line => line.trim() !== ""); // Remove empty lines
-  //   const board = createBoard();
-  
-  //   lines.forEach((line, rowIndex) => {
-  //     const numbers = line.trim().split(/\s+/); // Split on spaces
-  //     numbers.forEach((num, colIndex) => {
-  //       const value = parseInt(num, 10);
-  
-  //       // Fill with 0 if the value is invalid or the cell is empty
-  //       if (rowIndex < 9 && colIndex < 9) {
-  //         board[rowIndex][colIndex].value = !isNaN(value) ? value : 0;
-  //         board[rowIndex][colIndex].editable = value === 0; // Mark zeros as editable
-  //       }
-  //     });
-  //   });
-  
-  //   return board;
-  // };
-  
+
   const parseExtractedTextToBoard = (text: string): Board => {
     const lines = text.split('\n').filter(line => line.trim() !== ""); // Remove empty lines
     const board = createBoard();
@@ -152,6 +131,9 @@ const SudokuBoard = ({ board, setBoard ,isNewBoard }: { board: Board; setBoard: 
 
     setSelectedCell(cell);
     setHighlightedCells(calculateHighlightedCells(cell));
+    setTimeout(() => {
+      setHighlightedCells(new Set());
+    }, 500);
   };
 
   const getHint = () => {
