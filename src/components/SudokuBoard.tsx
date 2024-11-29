@@ -51,7 +51,7 @@ const SudokuBoard = ({ board, setBoard ,isNewBoard }: { board: Board; setBoard: 
       try {
         // Preprocess the image
         const canvas = preprocessImage(image);
-        document.body.appendChild(canvas); // Optional: Add canvas to view the result
+        // document.body.appendChild(canvas); // Optional: Add canvas to view the result
   
         // Extract text using OCR
         const extractedText = await extractTextFromImage(canvas);
