@@ -124,16 +124,14 @@ const SudokuBoard = ({ board, setBoard ,isNewBoard }: { board: Board; setBoard: 
     if (!cell.editable) return;
 
     if (selectedCell?.row === cell.row && selectedCell?.col === cell.col) {
-      setSelectedCell(null);
-      setHighlightedCells(new Set());
-      return;
+        setSelectedCell(null);
+        setHighlightedCells(new Set());
+        return;
     }
 
     setSelectedCell(cell);
     setHighlightedCells(calculateHighlightedCells(cell));
-    setTimeout(() => {
-      setHighlightedCells(new Set());
-    }, 500);
+
   };
 
   const getHint = () => {
@@ -191,7 +189,10 @@ const SudokuBoard = ({ board, setBoard ,isNewBoard }: { board: Board; setBoard: 
         const invalidKey = `${selectedCell.row},${selectedCell.col}`;
         setInvalidCells(new Set([invalidKey])); // Highlight the invalid cell
         setError("The provided number does not respect Sudoku rules");
-        setTimeout(() => setError(null), 3000); // Clear the error after 3 seconds
+        setTimeout(() => {
+          setError(null);
+          setInvalidCells(new Set());
+      }, 3000);
 
       }
     }
