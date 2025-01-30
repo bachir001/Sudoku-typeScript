@@ -1,4 +1,4 @@
-# Check Live Version of This App on the Following Link
+# Live Version of This Project 
 
 https://sudoku-typescript.onrender.com/
 
