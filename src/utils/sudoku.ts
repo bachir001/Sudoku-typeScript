@@ -1,8 +1,6 @@
 
 import { Board,createBoard } from "../types";
 
-import Tesseract from 'tesseract.js';
-
 export const generateSudokuBoard = (difficulty: number): Board => {
     const board = createBoard(); // Create an empty board
     solveSudoku(board); // Solve it to create a fully solved board
@@ -193,30 +191,4 @@ export const checkSudokuSolution = (board: Board): boolean => {
 
     return true; // If all checks pass, the solution is correct
 };
-
-
-export const extractTextFromImage = (canvas: HTMLCanvasElement): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      Tesseract.recognize(
-        canvas, 
-        'eng', 
-        {
-          // OCR configuration options
-          // @ts-ignore
-          tessedit_char_whitelist: '0123456789', // Only allow numbers
-          psm: Tesseract.PSM.SINGLE_BLOCK, // Adjust for single block of text
-        }
-      )
-      .then((result) => {
-        const text = result.data.text; // Access 'text' correctly
-        resolve(text);
-      })
-      .catch(error => {
-        console.error("OCR Error:", error);
-        reject("Failed to extract text from the image.");
-      });
-    });
-  };
-  
-  
   

@@ -2,8 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import Cell from './Cell';
 import { Board, Cell as CellType,createBoard } from '../types';
 import NumberSelector from './NumberSelector';
-import { isValid,solveSudoku,extractTextFromImage } from '../utils/sudoku';
-import {preprocessImage} from '../utils/opencvHelper'
+import { isValid,solveSudoku } from '../utils/sudoku';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import '../App.css';
   
@@ -39,45 +38,7 @@ const SudokuBoard = ({ board, setBoard ,isNewBoard }: { board: Board; setBoard: 
     }
   };
 
-  
-  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-  
-    const image = new Image();
-    image.src = URL.createObjectURL(file);
-  
-    image.onload = async () => {
-      try {
-        // Preprocess the image
-        const canvas = preprocessImage(image);
-        // document.body.appendChild(canvas); // Optional: Add canvas to view the result
-  
-        // Extract text using OCR
-        const extractedText = await extractTextFromImage(canvas);
-  
-        // Parse the extracted text into a 9x9 Sudoku board
-        const boardFromImage = parseExtractedTextToBoard(extractedText);
-  
-        if (!boardFromImage) {
-          setFeedbackMessage("Failed to extract a valid Sudoku board.");
-          setTimeout(() => setFeedbackMessage(null), 3000);
-          return;
-        }
-  
-        setBoard(boardFromImage);
-      } catch (error) {
-        console.error("Error processing the image:", error);
-        setFeedbackMessage("An error occurred during processing.");
-        setTimeout(() => setFeedbackMessage(null), 3000);
-      }
-    };
-  
-    image.onerror = () => {
-      setFeedbackMessage("Failed to load the image.");
-      setTimeout(() => setFeedbackMessage(null), 3000);
-    };
-  };
+
 
   const parseExtractedTextToBoard = (text: string): Board => {
     const lines = text.split('\n').filter(line => line.trim() !== ""); // Remove empty lines
@@ -203,13 +164,29 @@ const SudokuBoard = ({ board, setBoard ,isNewBoard }: { board: Board; setBoard: 
 
      <h1 className="text-2xl font-bold text-gray-700 mb-1 flex items-center space-x-2">
         <span>Sudoku</span>
+
+        <button 
+            aria-label="Get a hint"
+            onMouseEnter={() => setIsHintHovered(true)}
+            onMouseLeave={() => setIsHintHovered(false)}
+            onClick={() => { getHint(); }}
+            className="relative flex items-center justify-center  rounded-md z-10">
+            <i className="fas fa-question-circle text-xl"></i>
+            {isHintHovered && (
+              <span className="absolute top-1/2 right-[-200px] transform translate-y-[-50%]  text-sm bg-gray-700 text-white p-2 rounded-md opacity-100 transition-opacity duration-300">
+                Hint: Each time fill one cell
+              </span>
+            )}
+        </button>
+
+
         <button 
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
             onClick={
               handleSolve // Update the board with the solved version
             } 
-            className="relative flex items-center justify-center  rounded-md text-white z-10">
+            className="relative flex items-center justify-center  rounded-md text-white ">
             <i className="fas fa-puzzle-piece text-xl" style={{color: "#FFD43B"}}></i> {/* Lamp icon */}
             {isHovered && (
             <span className="absolute top-1/2 right-[-230px] transform translate-y-[-50%] text-sm bg-gray-700 text-white p-2 rounded-md opacity-100 transition-opacity duration-300">
@@ -218,33 +195,7 @@ const SudokuBoard = ({ board, setBoard ,isNewBoard }: { board: Board; setBoard: 
             )}
         </button>
 
-        <button 
-            aria-label="Get a hint"
-            onMouseEnter={() => setIsHintHovered(true)}
-            onMouseLeave={() => setIsHintHovered(false)}
-            onClick={() => { getHint(); }}
-            className="relative flex items-center justify-center  rounded-md text-white">
-            <i className="fas fa-question-circle text-xl"></i>
-            {isHintHovered && (
-              <span className="absolute top-1/2 right-[-200px] transform translate-y-[-50%] z-10 text-sm bg-gray-700 text-white p-2 rounded-md opacity-100 transition-opacity duration-300">
-                Hint: Each time fill one cell
-              </span>
-            )}
-        </button>
-
-        <div className="relative">
-            <label className="cursor-pointer">
-              <i className="fa-solid fa-arrow-up-from-bracket text-xl text-gray-600 hover:text-gray-800 transition-colors"></i>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageUpload}
-                className="hidden"
-              />
-            </label>
-        </div>
-
-
+       
      </h1>
 
       <div className="grid grid-cols-9 gap-0.5  mb-4">
